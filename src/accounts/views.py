@@ -4,13 +4,13 @@ from rest_framework.permissions import IsAuthenticated
 
 from accounts.serializers import UserSerializer, UserUpdateSerializer
 from accounts.models import User
-from accounts.permissions import IsAdminOrSelf
+from accounts.permissions import IsSelf
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated, IsAdminOrSelf]
+    permission_classes = [IsAuthenticated, IsSelf]
 
     def get_permissions(self):
         if self.action in ('create', 'list'):
