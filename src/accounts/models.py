@@ -40,10 +40,10 @@ class User(AbstractUser):
     phone = models.CharField(max_length=200, verbose_name='Телефон', blank=True, null=True)
     age = models.PositiveIntegerField(verbose_name='Возраст', blank=True, null=True)
     sex = models.CharField(choices=SEX, max_length=30, verbose_name='Пол', null=True, blank=True)
-    avatar = models.ImageField(upload_to=avatar_image_path, verbose_name=u"Изображение")
+    avatar = models.ImageField(upload_to=avatar_image_path, verbose_name=u"Изображение", null=True, blank=True)
     date_birth = models.DateField(blank=True, null=True, verbose_name='Дата рождение')
     email = models.EmailField(verbose_name='email address', unique=True)
-
+    username = models.CharField(max_length=200, null=True, blank=True)
 
     objects = CustomUserManager()
 
