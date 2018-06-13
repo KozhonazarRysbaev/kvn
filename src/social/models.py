@@ -26,9 +26,6 @@ class Post(models.Model):
     all_objects = models.Manager()
     objects = PostManager()
 
-    def __str__(self):
-        return self.user
-
     class Meta:
         verbose_name = _('Пост')
         verbose_name_plural = _('Посты')
