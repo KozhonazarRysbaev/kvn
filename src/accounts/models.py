@@ -6,6 +6,27 @@ from django.contrib.auth.models import BaseUserManager, AbstractUser, \
 from main.utils import avatar_image_path
 
 
+class CustomUserManager(BaseUserManager):
+    def create_user(self, *args, **kwargs):
+        user = self.model(
+            email=kwargs['email']
+        )
+        user.set_password(kwargs['password'])
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, *args, **kwargs):
+        user = self.model(
+            email=kwargs['email']
+        )
+        user.is_admin = True
+        user.is_staff = True
+        user.is_superuser = True
+        user.set_password(kwargs['password'])
+        user.save(using=self._db)
+        return user
+
+
 SEX = (
     ('male', 'Мужской'),
     ('female', 'Женский')
@@ -22,6 +43,9 @@ class User(AbstractUser):
     avatar = models.ImageField(upload_to=avatar_image_path, verbose_name=u"Изображение")
     date_birth = models.DateField(blank=True, null=True, verbose_name='Дата рождение')
     email = models.EmailField(verbose_name='email address', unique=True)
+
+
+    objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
