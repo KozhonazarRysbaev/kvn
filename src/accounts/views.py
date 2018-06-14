@@ -16,12 +16,12 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ('create', 'list'):
             self.permission_classes = ()
-        return super(UserViewSet, self).get_permissions()
+        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action in ('update', 'partial_update'):
             self.serializer_class = UserUpdateSerializer
-        return super(UserViewSet, self).get_serializer_class()
+        return super().get_serializer_class()
 
     def list(self, request, *args, **kwargs):
         raise Http404

@@ -9,13 +9,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth')
 
     def create(self, validated_data):
-        user = super(UserSerializer, self).create(validated_data)
+        user = super().create(validated_data)
         user.set_password(validated_data['password'])
         user.save()
         return user
 
     def to_representation(self, obj):
-        ret = super(UserSerializer, self).to_representation(obj)
+        ret = super().to_representation(obj)
         ret.pop('password')
         return ret
 
