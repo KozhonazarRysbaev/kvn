@@ -11,6 +11,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsSelf]
+    http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch')
 
     def get_permissions(self):
         if self.action in ('create', 'list'):
