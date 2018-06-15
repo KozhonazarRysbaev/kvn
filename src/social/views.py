@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from social.models import Post
-from social.permissions import IsoOwnerSelf
+from social.permissions import IsOwnerSelf
 from social.serializers import PostSerializer
 
 
@@ -32,7 +32,7 @@ class PostVieSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
-            self.permission_classes = [IsAuthenticated, IsoOwnerSelf]
+            self.permission_classes = [IsAuthenticated, IsOwnerSelf]
         else:
             self.permission_classes = [AllowAny]
         return super().get_permissions()
