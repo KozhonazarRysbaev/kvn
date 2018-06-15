@@ -24,6 +24,7 @@ schema_view = get_swagger_view(title='kvnet docs API')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
+    path('social/', include('social.urls')),
     path('docs/', schema_view),
 ]
 
