@@ -8,6 +8,22 @@ from accounts.permissions import IsSelf
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """
+        retrieve:
+            Return a user instance.
+
+        list:
+            Return all users, ordered by most recently joined.
+
+        create:
+            Create a new user.
+
+        partial_update:
+            Update one or more fields on an existing user, only owner is available.
+
+        update:
+           Update user, only owner is available
+        """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsSelf]
