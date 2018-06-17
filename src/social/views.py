@@ -31,8 +31,10 @@ class PostVieSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch', 'delete')
 
     def get_permissions(self):
-        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+        if self.action in ('update', 'partial_update', 'destroy'):
             self.permission_classes = [IsAuthenticated, IsOwnerSelf]
+        elif self.action == 'create':
+            self.permission_classes = [IsAuthenticated]
         else:
             self.permission_classes = [AllowAny]
         return super().get_permissions()
