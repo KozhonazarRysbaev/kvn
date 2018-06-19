@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractUser, \
     PermissionsMixin
 
-from main.utils import avatar_image_path
+from main.utils import avatar_image_path, wallpaper_image_path
 
 
 class CustomUserManager(BaseUserManager):
@@ -42,6 +42,7 @@ class User(AbstractUser):
     date_birth = models.DateField(blank=True, null=True, verbose_name='Дата рождение')
     email = models.EmailField(verbose_name='email address', unique=True)
     username = models.CharField(max_length=200, null=True, blank=True)
+    wallpaper = models.ImageField(upload_to=wallpaper_image_path, verbose_name=u"Обои", null=True, blank=True)
 
     objects = CustomUserManager()
 
