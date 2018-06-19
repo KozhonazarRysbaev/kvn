@@ -55,8 +55,7 @@ class PostVieSet(viewsets.ModelViewSet):
         post = Post.objects.get(id=instance.id)
         post.views += 1
         post.save()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        return super().retrieve(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
         post = Post.objects.get(id=instance.id)
