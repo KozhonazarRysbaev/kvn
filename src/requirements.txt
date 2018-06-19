@@ -6,3 +6,5 @@ Pillow==5.1.0
 PyJWT==1.6.4
 pytz==2018.4
 django-rest-swagger==2.2.0
+sorl-thumbnail-serializer-field==0.2.1
+django-filter==1.1.0
