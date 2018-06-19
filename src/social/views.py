@@ -1,10 +1,11 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
 
 from social.filters import PostFilter
 from social.models import Post
 from social.permissions import IsOwnerSelf
-from social.serializers import PostSerializer
+from social.serializers import PostSerializer, BasePostSerializer
 
 
 class PostVieSet(viewsets.ModelViewSet):
@@ -28,7 +29,7 @@ class PostVieSet(viewsets.ModelViewSet):
         Update a post, only the owner can update the post.
     """
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = BasePostSerializer
     http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch', 'delete')
     filter_class = PostFilter
 
@@ -41,8 +42,21 @@ class PostVieSet(viewsets.ModelViewSet):
             self.permission_classes = [AllowAny]
         return super().get_permissions()
 
+    def get_serializer_class(self):
+        if self.action in ('create', 'update', 'partial_update'):
+            self.serializer_class = PostSerializer
+        return super().get_serializer_class()
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        post = Post.objects.get(id=instance.id)
+        post.views += 1
+        post.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     def perform_destroy(self, instance):
         post = Post.objects.get(id=instance.id)
