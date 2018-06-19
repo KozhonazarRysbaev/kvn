@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from social.filters import PostFilter
 from social.models import Post
 from social.permissions import IsOwnerSelf
 from social.serializers import PostSerializer
@@ -29,6 +30,7 @@ class PostVieSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch', 'delete')
+    filter_class = PostFilter
 
     def get_permissions(self):
         if self.action in ('update', 'partial_update', 'destroy'):
