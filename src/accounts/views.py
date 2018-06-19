@@ -30,7 +30,7 @@ class UserViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch')
 
     def get_permissions(self):
-        if self.action in ('create', 'list'):
+        if self.action in ('create', 'list', 'retrieve'):
             self.permission_classes = ()
         return super().get_permissions()
 
