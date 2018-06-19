@@ -142,7 +142,7 @@ JWT_AUTH = {
 
 }
 
-FILE_UPLOAD_PERMISSIONS = '0777'
+FILE_UPLOAD_PERMISSIONS = 0o644
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
