@@ -8,3 +8,4 @@ virtualenv
 settings_local.py
 src/static
 src/media
+.env

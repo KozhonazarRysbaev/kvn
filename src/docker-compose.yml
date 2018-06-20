@@ -1,0 +1,27 @@
+version: "2"
+
+volumes:
+  kvn_databse:
+
+services:
+
+  web:
+    build: ./
+    volumes:
+    - ./:/usr/src/kvnet
+    ports:
+    - 8000:8000
+    depends_on:
+    - db
+    environment:
+    - DB_HOST=db
+
+  db:
+     image: mysql:5.7
+     environment:
+     - MYSQL_ROOT_PASSWORD
+     - MYSQL_USER
+     - MYSQL_DATABASE
+     volumes:
+     - kvn_databse:/var/lib/mysql
+
