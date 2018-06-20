@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
 
 from accounts.models import User
 from social.models import Post
@@ -12,6 +13,7 @@ class UserPostSerializer(serializers.ModelSerializer):
 
 class BasePostSerializer(serializers.ModelSerializer):
     user = UserPostSerializer(many=False)
+    image = HyperlinkedSorlImageField('1024')
 
     class Meta:
         model = Post
