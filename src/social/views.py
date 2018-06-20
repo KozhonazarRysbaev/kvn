@@ -28,7 +28,7 @@ class PostVieSet(viewsets.ModelViewSet):
     update:
         Update a post, only the owner can update the post.
     """
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by('-created_at')
     serializer_class = BasePostSerializer
     http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch', 'delete')
     filter_class = PostFilter
