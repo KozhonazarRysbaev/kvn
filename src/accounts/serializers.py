@@ -1,8 +1,13 @@
 from rest_framework import serializers
+from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
+
 from accounts.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    avatar = HyperlinkedSorlImageField('2000')
+    wallpaper = HyperlinkedSorlImageField('2000')
+
     class Meta:
         model = User
         fields = (

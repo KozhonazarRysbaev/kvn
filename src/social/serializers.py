@@ -6,6 +6,8 @@ from social.models import Post
 
 
 class UserPostSerializer(serializers.ModelSerializer):
+    avatar = HyperlinkedSorlImageField('2000')
+
     class Meta:
         model = User
         fields = ('id', 'first_name', 'last_name', 'avatar')
@@ -13,7 +15,7 @@ class UserPostSerializer(serializers.ModelSerializer):
 
 class BasePostSerializer(serializers.ModelSerializer):
     user = UserPostSerializer(many=False)
-    image = HyperlinkedSorlImageField('1024')
+    image = HyperlinkedSorlImageField('2000')
 
     class Meta:
         model = Post
