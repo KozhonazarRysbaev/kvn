@@ -5,8 +5,8 @@ from accounts.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    avatar = HyperlinkedSorlImageField('1024')
-    wallpaper = HyperlinkedSorlImageField('1024')
+    avatar = HyperlinkedSorlImageField('1024', required=False)
+    wallpaper = HyperlinkedSorlImageField('1024', required=False)
 
     class Meta:
         model = User
