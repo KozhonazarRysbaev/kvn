@@ -15,6 +15,9 @@ services:
     - db
     environment:
     - DB_HOST=db
+    - DB_NAME
+    - DB_USERNAME
+    - DB_PASSWORD
 
   db:
      image: mysql:5.7
