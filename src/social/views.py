@@ -1,6 +1,6 @@
+from django.db.models import F
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
 
 from social.filters import PostFilter
 from social.models import Post
@@ -51,14 +51,12 @@ class PostVieSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        post = Post.objects.get(id=instance.id)
-        post.views += 1
-        post.save()
+        post = self.get_object()
+        post.views = F('views') + 1
+        post.save(update_fields=['views'])
         return super().retrieve(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
-        post = Post.objects.get(id=instance.id)
-        post.is_delete = True
-        post.publish = False
-        post.save()
+        instance.is_delete = True
+        instance.publish = False
+        instance.save()

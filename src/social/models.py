@@ -9,7 +9,7 @@ User = get_user_model()
 
 class PostManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('user').filter(is_delete=False, publish=True)
+        return super().get_queryset().prefetch_related('user').filter(is_delete=False, publish=True)
 
 
 class Post(models.Model):
