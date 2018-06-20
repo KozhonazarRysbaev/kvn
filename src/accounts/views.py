@@ -10,7 +10,7 @@ from accounts.permissions import IsSelf
 class UserViewSet(viewsets.ModelViewSet):
     """
         retrieve:
-            Return a user instance.
+            Return a user instance. Returns user posts, do pagination ?offset=int
 
         list:
             Return all users, ordered by most recently joined.

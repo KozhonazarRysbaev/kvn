@@ -1,17 +1,35 @@
-from rest_framework import serializers
+from rest_framework import serializers, pagination
 from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
 
 from accounts.models import User
+from social.models import Post
+
+
+class PostUserSerializer(serializers.ModelSerializer):
+    image = HyperlinkedSorlImageField('1024', required=False)
+
+    class Meta:
+        model = Post
+        fields = ('id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views')
 
 
 class UserSerializer(serializers.ModelSerializer):
     avatar = HyperlinkedSorlImageField('1024', required=False)
     wallpaper = HyperlinkedSorlImageField('1024', required=False)
+    posts = serializers.SerializerMethodField('paginated_posts')
 
     class Meta:
         model = User
         fields = (
-            'id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper')
+            'id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper',
+            'posts')
+
+    def paginated_posts(self, obj):
+        tracks = Post.objects.filter(user=obj)
+        paginator = pagination.LimitOffsetPagination()
+        page = paginator.paginate_queryset(tracks, self.context['request'])
+        serializer = PostUserSerializer(page, many=True, context={'request': self.context['request']})
+        return serializer.data
 
     def create(self, validated_data):
         user = super().create(validated_data)
