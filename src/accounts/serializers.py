@@ -1,4 +1,4 @@
-from rest_framework import serializers, pagination
+from rest_framework import serializers
 from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
 
 from accounts.models import User
@@ -16,20 +16,13 @@ class PostUserSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     avatar = HyperlinkedSorlImageField('1024', required=False)
     wallpaper = HyperlinkedSorlImageField('1024', required=False)
-    posts = serializers.SerializerMethodField('paginated_posts')
+    post_count = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = (
             'id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper',
-            'posts')
-
-    def paginated_posts(self, obj):
-        posts = Post.objects.filter(user=obj)
-        paginator = pagination.LimitOffsetPagination()
-        page = paginator.paginate_queryset(posts, self.context['request'])
-        serializer = PostUserSerializer(page, many=True, context={'request': self.context['request']})
-        return serializer.data
+            'post_count')
 
     def create(self, validated_data):
         user = super().create(validated_data)
@@ -41,6 +34,10 @@ class UserSerializer(serializers.ModelSerializer):
         ret = super().to_representation(obj)
         ret.pop('password')
         return ret
+
+    @staticmethod
+    def get_post_count(obj):
+        return obj.posts.all().count()
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

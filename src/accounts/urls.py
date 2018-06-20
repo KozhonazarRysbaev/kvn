@@ -8,6 +8,7 @@ from accounts import views
 
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'users', views.UserViewSet)
+router.register(r'users/(?P<user_pk>[0-9]+)/posts', views.UserPostViewSet, base_name='user_posts')
 
 urlpatterns = [
     path(r'', include(router.urls)),

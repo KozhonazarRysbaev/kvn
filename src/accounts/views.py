@@ -1,16 +1,17 @@
-from django.http import JsonResponse, Http404
+from django.http import Http404
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from accounts.serializers import UserSerializer, UserUpdateSerializer
+from accounts.serializers import UserSerializer, UserUpdateSerializer, PostUserSerializer
 from accounts.models import User
 from accounts.permissions import IsSelf
+from social.models import Post
 
 
 class UserViewSet(viewsets.ModelViewSet):
     """
         retrieve:
-            Return a user instance. Returns user posts, do pagination ?offset=int
+            Return a user instance
 
         list:
             Return all users, ordered by most recently joined.
@@ -42,3 +43,21 @@ class UserViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         raise Http404
 
+
+class UserPostViewSet(viewsets.ModelViewSet):
+    """
+       retrieve:
+           Not work, return 404 Not Found
+
+       list:
+           Return all posts by user
+    """
+    serializer_class = PostUserSerializer
+    permission_classes = [AllowAny]
+    http_method_names = ('get', 'head', 'options')
+
+    def retrieve(self, request, *args, **kwargs):
+        raise Http404
+
+    def get_queryset(self):
+        return Post.objects.filter(user_id=self.kwargs['user_pk'])
