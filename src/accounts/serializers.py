@@ -25,9 +25,9 @@ class UserSerializer(serializers.ModelSerializer):
             'posts')
 
     def paginated_posts(self, obj):
-        tracks = Post.objects.filter(user=obj)
+        posts = Post.objects.filter(user=obj)
         paginator = pagination.LimitOffsetPagination()
-        page = paginator.paginate_queryset(tracks, self.context['request'])
+        page = paginator.paginate_queryset(posts, self.context['request'])
         serializer = PostUserSerializer(page, many=True, context={'request': self.context['request']})
         return serializer.data
 
