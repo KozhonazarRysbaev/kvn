@@ -40,6 +40,16 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.posts.all().count()
 
 
+class RatingUser(UserSerializer):
+    views_count = serializers.IntegerField()
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper',
+            'post_count', 'views_count')
+
+
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

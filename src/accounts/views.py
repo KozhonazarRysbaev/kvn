@@ -1,14 +1,19 @@
 from django.http import Http404
+from django.db.models import Sum, Q
+from django.db.models import OuterRef, Subquery
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 
-from accounts.serializers import UserSerializer, UserUpdateSerializer, PostUserSerializer
+from accounts.serializers import UserSerializer, UserUpdateSerializer, PostUserSerializer, RatingUser
 from accounts.models import User
 from accounts.permissions import IsSelf
 from social.models import Post
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
     """
         retrieve:
             Return a user instance
@@ -29,6 +34,20 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsSelf]
     http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch')
+
+    @action(detail=False)
+    def rating(self, request):
+        content = request.GET.get('content', 'image')
+        posts = Post.objects.exclude(**{content: ''})
+        users = User.objects.prefetch_related('posts').filter(posts__in=posts.values('id')).annotate(
+            views_count=Sum('posts__views')).order_by('-views_count')
+        page = self.paginate_queryset(users)
+        if page is not None:
+            serializer = RatingUser(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(users, many=True)
+        return Response(serializer.data)
 
     def get_permissions(self):
         if self.action in ('create', 'list', 'retrieve'):

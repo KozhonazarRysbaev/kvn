@@ -13,6 +13,8 @@ class UserPostSerializer(serializers.ModelSerializer):
         fields = ('id', 'first_name', 'last_name', 'avatar')
 
 
+
+
 class BasePostSerializer(serializers.ModelSerializer):
     user = UserPostSerializer(many=False)
     image = HyperlinkedSorlImageField('1024', required=False)
@@ -26,3 +28,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height')
+    
+    def create(self, validated_data):
+        print(validated_data)
+        return super(PostSerializer, self).create(validated_data)
