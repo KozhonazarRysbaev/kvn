@@ -14,7 +14,7 @@ class PostManager(models.Manager):
 
 class Post(models.Model):
     user = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
-    title = models.CharField(max_length=250, verbose_name=_('Заголовок'), blank=True, null=True)
+    title = models.CharField(max_length=250, verbose_name=_('Заголовок'), blank=True, null=True, db_index=True)
     description = models.TextField(blank=True, null=True, verbose_name=_('Описание'))
     video_file = models.FileField(upload_to=post_video_path, verbose_name=_('Видео'), blank=True, null=True)
     image = models.ImageField(upload_to=post_image_path, verbose_name=_('Изображение'), blank=True, null=True,
