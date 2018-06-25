@@ -29,6 +29,9 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
 
         update:
            Update user, only owner is available
+
+        rating:
+           Return all users, ordered by ratting, filter get parameter /accounts/users/rating?content=image, video_file.
         """
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -50,7 +53,7 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
         return Response(serializer.data)
 
     def get_permissions(self):
-        if self.action in ('create', 'list', 'retrieve'):
+        if self.action in ('create', 'list', 'retrieve', 'rating'):
             self.permission_classes = ()
         return super().get_permissions()
 
