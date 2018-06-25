@@ -6,6 +6,12 @@ from location.serializers import CitySerializer
 
 
 class CityViewSet(ModelViewSet):
+    """
+    list:
+        Return all cities.
+    retrieve:
+        Return a city instance.
+    """
     http_method_names = ('get', 'head', 'options',)
     permission_classes = (AllowAny,)
     serializer_class = CitySerializer
