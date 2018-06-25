@@ -51,10 +51,6 @@ class BaseLocationCityTest(CommonTestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK, res.json())
         ret = res.json()
         self.assertEqual({
-            'pk': city.pk,
+            'id': city.pk,
             'name': city.name,
-            'region': {
-                'pk': city.region.pk,
-                'name': city.region.name,
-            }
         }, ret)
