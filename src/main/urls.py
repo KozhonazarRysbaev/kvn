@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('social/', include('social.urls')),
+    path('location/', include('location.urls', namespace='location')),
     path('docs/', schema_view),
 ]
 

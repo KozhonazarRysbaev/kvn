@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_filters',
     'accounts',
     'social',
+    'location'
 ]
 
 MIDDLEWARE = [
@@ -190,6 +191,8 @@ STATICFILES_DIRS = [
 # media
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+FIXTURES_DIR = os.path.join(os.path.dirname(BASE_DIR), 'fixtures')
 
 try:
     from main.settings_local import *
