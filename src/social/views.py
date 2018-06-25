@@ -3,9 +3,9 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from social.filters import PostFilter
-from social.models import Post
+from social.models import Post, Events
 from social.permissions import IsOwnerSelf
-from social.serializers import PostSerializer, BasePostSerializer
+from social.serializers import PostSerializer, BasePostSerializer, EventSerializer
 
 
 class PostVieSet(viewsets.ModelViewSet):
@@ -60,3 +60,16 @@ class PostVieSet(viewsets.ModelViewSet):
         instance.is_delete = True
         instance.publish = False
         instance.save()
+
+
+class EventVieSet(viewsets.ModelViewSet):
+    """
+    list:
+        Return all event.
+    retrieve:
+        Return a event instance.
+    """
+    http_method_names = ('get', 'head', 'options',)
+    permission_classes = (AllowAny,)
+    queryset = Events.objects.all()
+    serializer_class = EventSerializer
