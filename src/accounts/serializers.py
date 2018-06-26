@@ -46,19 +46,20 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'team_id')
 
     def create(self, validated_data):
-        user = User.objects.create(email=validated_data['email'],
-                                   phone=validated_data.get('phone', None),
-                                   sex=validated_data.get('sex', None),
-                                   avatar=validated_data.get('avatar', None),
-                                   date_birth=validated_data.get('date_birth', None),
-                                   first_name=validated_data.get('first_name', None),
-                                   last_name=validated_data.get('last_name', None),
-                                   wallpaper=validated_data.get('wallpaper', None),
-                                   )
+        user = User(email=validated_data['email'],
+                    phone=validated_data.get('phone', None),
+                    sex=validated_data.get('sex', None),
+                    avatar=validated_data.get('avatar', None),
+                    date_birth=validated_data.get('date_birth', None),
+                    first_name=validated_data.get('first_name', None),
+                    last_name=validated_data.get('last_name', None),
+                    wallpaper=validated_data.get('wallpaper', None),
+                    )
         user.set_password(validated_data['password'])
         user.save()
-        team_id = validated_data['team_id']
-        RequestTeam.objects.create(team_id=team_id, user=user)
+        team_id = validated_data.get('team_id', None)
+        if team_id:
+            RequestTeam.objects.create(team_id=team_id, user=user)
         return user
 
     def to_representation(self, obj):
