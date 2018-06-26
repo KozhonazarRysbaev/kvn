@@ -3,9 +3,9 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from social.filters import PostFilter
-from social.models import Post, Events
+from social.models import Post, Events, Team
 from social.permissions import IsOwnerSelf
-from social.serializers import PostSerializer, BasePostSerializer, EventSerializer
+from social.serializers import PostSerializer, BasePostSerializer, EventSerializer, TeamSerializer
 
 
 class PostVieSet(viewsets.ModelViewSet):
@@ -73,3 +73,16 @@ class EventVieSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     queryset = Events.objects.all()
     serializer_class = EventSerializer
+
+
+class TeamVieSet(viewsets.ModelViewSet):
+    """
+    list:
+        Return all teams.
+    retrieve:
+        Return a team instance.
+    """
+    http_method_names = ('get', 'head', 'options',)
+    permission_classes = (AllowAny,)
+    queryset = Team.objects.all()
+    serializer_class = TeamSerializer
