@@ -7,7 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
-from accounts.serializers import UserSerializer, UserUpdateSerializer, PostUserSerializer, RatingUser
+from accounts.serializers import UserSerializer, UserUpdateSerializer, PostUserSerializer, RatingUser, \
+    UserCreateSerializer
 from accounts.models import User
 from accounts.permissions import IsSelf
 from social.models import Post
@@ -60,6 +61,8 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
     def get_serializer_class(self):
         if self.action in ('update', 'partial_update'):
             self.serializer_class = UserUpdateSerializer
+        elif self.action == 'create':
+            self.serializer_class = UserCreateSerializer
         return super().get_serializer_class()
 
     def list(self, request, *args, **kwargs):

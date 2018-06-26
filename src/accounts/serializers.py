@@ -2,7 +2,7 @@ from rest_framework import serializers
 from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
 
 from accounts.models import User
-from social.models import Post
+from social.models import Post, RequestTeam
 
 
 class PostUserSerializer(serializers.ModelSerializer):
@@ -24,12 +24,6 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper',
             'post_count')
 
-    def create(self, validated_data):
-        user = super().create(validated_data)
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
-
     def to_representation(self, obj):
         ret = super().to_representation(obj)
         ret.pop('password')
@@ -38,6 +32,39 @@ class UserSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_post_count(obj):
         return obj.posts.all().count()
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    avatar = HyperlinkedSorlImageField('1024', required=False)
+    wallpaper = HyperlinkedSorlImageField('1024', required=False)
+    team_id = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper',
+            'team_id')
+
+    def create(self, validated_data):
+        user = User.objects.create(email=validated_data['email'],
+                                   phone=validated_data.get('phone', None),
+                                   sex=validated_data.get('sex', None),
+                                   avatar=validated_data.get('avatar', None),
+                                   date_birth=validated_data.get('date_birth', None),
+                                   first_name=validated_data.get('first_name', None),
+                                   last_name=validated_data.get('last_name', None),
+                                   wallpaper=validated_data.get('wallpaper', None),
+                                   )
+        user.set_password(validated_data['password'])
+        user.save()
+        team_id = validated_data['team_id']
+        RequestTeam.objects.create(team_id=team_id, user=user)
+        return user
+
+    def to_representation(self, obj):
+        ret = super().to_representation(obj)
+        ret.pop('password')
+        return ret
 
 
 class RatingUser(UserSerializer):

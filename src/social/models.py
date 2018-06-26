@@ -54,6 +54,15 @@ class Team(models.Model):
         return self.title
 
 
+class RequestTeam(models.Model):
+    team = models.ForeignKey(Team, related_name='team_requests', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='user_requests', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = _('Заявка пользователя')
+        verbose_name_plural = _('Заявки пользователя')
+
+
 class Events(models.Model):
     title = models.CharField(max_length=150, verbose_name=_('Название'))
     created_at = models.DateTimeField(verbose_name=_('Дата и время начала'))
