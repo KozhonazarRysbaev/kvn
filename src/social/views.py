@@ -72,7 +72,7 @@ class EventVieSet(viewsets.ModelViewSet):
     """
     http_method_names = ('get', 'head', 'options',)
     permission_classes = (AllowAny,)
-    queryset = Events.objects.all()
+    queryset = Events.objects.all().order_by('-created_at')
     serializer_class = BaseEventSerializer
 
     def get_serializer_class(self):

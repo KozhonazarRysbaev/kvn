@@ -54,11 +54,13 @@ class TeamSerializer(serializers.ModelSerializer):
 
 class BaseEventSerializer(serializers.ModelSerializer):
     team = TeamSerializer(many=True)
-    status = serializers.SerializerMethodField()
+    created_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
+    expired_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
+    # status = serializers.SerializerMethodField()
 
     class Meta:
         model = Events
-        fields = ('id', 'title', 'status', 'team')
+        fields = ('id', 'title', 'created_at', 'expired_at', 'team')
 
     def get_status(self, obj):
         return 'true'
