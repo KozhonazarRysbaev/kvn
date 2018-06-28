@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from location.models import City
-from main.utils import post_video_path, post_image_path
+from main.utils import post_video_path, post_image_path, team_logo_path
 
 User = get_user_model()
 
@@ -45,6 +45,7 @@ class Team(models.Model):
     city = models.ForeignKey(City, null=True, blank=True, on_delete=models.SET_NULL)
     owner = models.ForeignKey(User, related_name='team_owners', on_delete=models.CASCADE)
     members = models.ManyToManyField(User, related_name='team_members')
+    logo = models.ImageField(upload_to=team_logo_path, verbose_name=_('Лого'))
 
     class Meta:
         verbose_name = _('Команда')

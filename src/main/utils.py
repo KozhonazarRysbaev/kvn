@@ -23,3 +23,9 @@ def post_image_path(instance, filename):
     ext = filename.split('.')[-1]
     filename = "%s.%s" % (uuid.uuid4(), ext)
     return 'images/{0}'.format(filename)
+
+
+def team_logo_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s.%s" % (uuid.uuid4(), ext)
+    return 'team/images/{0}'.format(filename)
