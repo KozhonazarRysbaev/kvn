@@ -82,3 +82,11 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'phone', 'sex', 'avatar', 'date_birth', 'wallpaper', 'first_name', 'last_name')
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """
+        Serializer for password change endpoint.
+        """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
