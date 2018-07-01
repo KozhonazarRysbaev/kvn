@@ -56,7 +56,7 @@ class PostVieSet(viewsets.ModelViewSet):
                     SELECT type FROM social_crown WHERE post_id=social_post.id
                 """
         post = Post.objects.exclude(**{content: ''}).select_related('user').annotate(
-            crown=RawSQL(crown_query, ())).order_by(F('crown').desc(nulls_last=True), F('-views').desc(nulls_last=True))
+            crown=RawSQL(crown_query, ())).order_by(F('crown').desc(nulls_last=True), F('views').desc(nulls_last=True))
 
         page = self.paginate_queryset(post)
         if page is not None:
