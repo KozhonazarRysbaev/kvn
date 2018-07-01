@@ -33,7 +33,7 @@ class PostVieSet(viewsets.ModelViewSet):
         Update a post, only the owner can update the post.
 
     rating:
-        Return all posts, ordered by ratting, filter get parameter /social/posts/rating?content=image, video_file.
+        Return all posts, ordered by ratting, filter get parameter /social/posts/rating?content=image, video_file. crown 0 - gold, 1-silver, 2-bronze
     """
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = BasePostSerializer
