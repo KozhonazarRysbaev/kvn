@@ -8,3 +8,6 @@ pytz==2018.4
 django-rest-swagger==2.2.0
 sorl-thumbnail-serializer-field==0.2.1
 django-filter==1.1.0
+celery==4.2.0
+django-celery-beat==1.1.1
+django-celery-results-1.0.1
