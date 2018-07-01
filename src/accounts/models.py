@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractUser, \
     PermissionsMixin
@@ -48,3 +49,9 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+    @property
+    def default_avatar(self):
+        if self.avatar:
+            return "{}{}".format(settings.MEDIA_URL, self.avatar)
+        return '/media/avatars/494743aa-12f1-4ad6-a6c8-ae70bdd103d2.jpg'

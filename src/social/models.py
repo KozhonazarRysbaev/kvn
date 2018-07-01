@@ -32,6 +32,7 @@ class Post(models.Model):
     # store width & height to get them without PIL
     image_width = models.PositiveIntegerField(default=0)
     image_height = models.PositiveIntegerField(default=0)
+    comment_status = models.BooleanField(default=True, verbose_name=_('Разрешение на комментарий'))
 
     all_objects = models.Manager()
     objects = PostManager()
@@ -39,6 +40,19 @@ class Post(models.Model):
     class Meta:
         verbose_name = _('Пост')
         verbose_name_plural = _('Посты')
+        ordering = ['-created_at']
+
+
+class PostComment(models.Model):
+    user = models.ForeignKey(User, related_name='comment_user', on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='post_comment', on_delete=models.CASCADE)
+    comment = models.TextField(verbose_name=_('Комментарий'))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Создан'))
+    edited_at = models.DateTimeField(auto_now=True, null=True, verbose_name=_('Когда редактирован'))
+
+    class Meta:
+        verbose_name = _('Комментарий поста')
+        verbose_name_plural = _('Комментарии постов')
         ordering = ['-created_at']
 
 

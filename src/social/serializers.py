@@ -4,7 +4,7 @@ from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
 
 from accounts.models import User
 from location.serializers import CitySerializer
-from social.models import Post, Events, Team
+from social.models import Post, Events, Team, PostComment
 
 
 class DateTimeFieldWihTZ(serializers.DateTimeField):
@@ -28,7 +28,8 @@ class BasePostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = (
-            'id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views', 'user')
+            'id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views',
+            'comment_status', 'user')
 
 
 class RatingPost(BasePostSerializer):
@@ -46,7 +47,7 @@ class RatingPost(BasePostSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ('id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height')
+        fields = ('id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'comment_status')
 
 
 class BaseTeamSerializer(serializers.ModelSerializer):
@@ -70,8 +71,6 @@ class BaseEventSerializer(serializers.ModelSerializer):
     created_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
     expired_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
 
-    # status = serializers.SerializerMethodField()
-
     class Meta:
         model = Events
         fields = ('id', 'title', 'created_at', 'expired_at', 'team')
@@ -88,3 +87,15 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Events
         fields = ('id', 'title', 'created_at', 'expired_at', 'team')
+
+
+class PostCommentSerializer(serializers.ModelSerializer):
+    user = UserPostSerializer(many=False, read_only=True)
+    created_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M", read_only=True)
+
+    class Meta:
+        model = PostComment
+        fields = ('id', 'comment', 'created_at', 'user')
+
+    def create(self, validated_data):
+        return PostComment.objects.create(**validated_data)

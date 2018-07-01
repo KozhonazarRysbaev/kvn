@@ -1,15 +1,16 @@
 from django.db.models import F
 from django.db.models.expressions import RawSQL
+from django.http import Http404
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from social.filters import PostFilter, TeamFilter
-from social.models import Post, Events, Team
-from social.permissions import IsOwnerSelf
+from social.models import Post, Events, Team, PostComment
+from social.permissions import IsOwnerSelf, IsCommentStatus
 from social.serializers import PostSerializer, BasePostSerializer, EventSerializer, BaseEventSerializer, \
-    BaseTeamSerializer, RatingPost
+    BaseTeamSerializer, RatingPost, PostCommentSerializer
 
 
 class PostVieSet(viewsets.ModelViewSet):
@@ -33,7 +34,8 @@ class PostVieSet(viewsets.ModelViewSet):
         Update a post, only the owner can update the post.
 
     rating:
-        Return all posts, ordered by ratting, filter get parameter /social/posts/rating?content=image, video_file. crown 0 - gold, 1-silver, 2-bronze
+        Return all posts, ordered by ratting, filter get parameter /social/posts/rating?content=image, video_file.
+         crown 0 - gold, 1-silver, 2-bronze
     """
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = BasePostSerializer
@@ -116,3 +118,43 @@ class TeamVieSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = BaseTeamSerializer
     filter_class = TeamFilter
+
+
+class PostCommentVieSet(viewsets.ModelViewSet):
+    """
+    retrieve:
+        Return a comment instance.
+
+    list:
+        Return all comments
+
+    create:
+        Creates a new comment, only for authorized users.
+
+    delete:
+        Removes the comment, only the owner can remove the comment.
+
+    partial_update:
+        Update one or more fields on an existing comment, only the owner can update the comment.
+
+    update:
+        Update a comment, only the owner can update the comment.
+    """
+    permission_classes = [IsAuthenticated, IsCommentStatus]
+    serializer_class = PostCommentSerializer
+    http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch', 'delete')
+
+    def get_queryset(self):
+        return PostComment.objects.filter(post__id=self.kwargs['post_pk'])
+
+    def get_permissions(self):
+        if self.action in ('update', 'partial_update', 'destroy'):
+            self.permission_classes = [IsAuthenticated, IsOwnerSelf, IsCommentStatus]
+        elif self.action == 'create':
+            self.permission_classes = [IsAuthenticated, IsCommentStatus]
+        else:
+            self.permission_classes = [AllowAny, IsCommentStatus]
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user, post_id=self.kwargs['post_pk'])
