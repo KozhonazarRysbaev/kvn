@@ -1,15 +1,15 @@
-from datetime import timedelta, date
-
 from django.db.models import F
 from django.db.models.expressions import RawSQL
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
 
 from social.filters import PostFilter, TeamFilter
 from social.models import Post, Events, Team
 from social.permissions import IsOwnerSelf
-from social.serializers import PostSerializer, BasePostSerializer, EventSerializer, TeamSerializer, BaseEventSerializer, \
-    BaseTeamSerializer
+from social.serializers import PostSerializer, BasePostSerializer, EventSerializer, BaseEventSerializer, \
+    BaseTeamSerializer, RatingPost
 
 
 class PostVieSet(viewsets.ModelViewSet):
@@ -31,6 +31,9 @@ class PostVieSet(viewsets.ModelViewSet):
 
     update:
         Update a post, only the owner can update the post.
+
+    rating:
+        Return all posts, ordered by ratting, filter get parameter /social/posts/rating?content=image, video_file.
     """
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = BasePostSerializer
@@ -46,14 +49,22 @@ class PostVieSet(viewsets.ModelViewSet):
             self.permission_classes = [AllowAny]
         return super().get_permissions()
 
-    def get_queryset(self):
-        today = date.today()
-        get_sunday = (today - timedelta(days=today.weekday())) - timedelta(days=1)
-        get_monday = get_sunday - timedelta(days=7)
+    @action(detail=False)
+    def rating(self, request):
+        content = request.GET.get('content', 'image')
         crown_query = """
-            SELECT type FROM social_crown WHERE post_id=social_post.id
-        """
-        return Post.objects.select_related('user').annotate(crown=RawSQL(crown_query, ())).order_by('crown', '-created_at')
+                    SELECT type FROM social_crown WHERE post_id=social_post.id
+                """
+        post = Post.objects.exclude(**{content: ''}).select_related('user').annotate(
+            crown=RawSQL(crown_query, ())).order_by('crown', '-views')
+
+        page = self.paginate_queryset(post)
+        if page is not None:
+            serializer = RatingPost(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(post, many=True)
+        return Response(serializer.data)
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):

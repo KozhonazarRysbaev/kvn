@@ -24,11 +24,23 @@ class UserPostSerializer(serializers.ModelSerializer):
 class BasePostSerializer(serializers.ModelSerializer):
     user = UserPostSerializer(many=False)
     image = HyperlinkedSorlImageField('1024', required=False)
+
+    class Meta:
+        model = Post
+        fields = (
+            'id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views', 'user')
+
+
+class RatingPost(BasePostSerializer):
+    user = UserPostSerializer(many=False)
+    image = HyperlinkedSorlImageField('1024', required=False)
     crown = serializers.IntegerField()
 
     class Meta:
         model = Post
-        fields = ('id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views', 'user', 'crown')
+        fields = (
+            'id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views', 'user',
+            'crown')
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -57,6 +69,7 @@ class BaseEventSerializer(serializers.ModelSerializer):
     team = TeamSerializer(many=True)
     created_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
     expired_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
+
     # status = serializers.SerializerMethodField()
 
     class Meta:

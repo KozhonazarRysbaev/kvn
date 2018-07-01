@@ -31,30 +31,28 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
         update:
            Update user, only owner is available
 
-        rating:
-           Return all users, ordered by ratting, filter get parameter /accounts/users/rating?content=image, video_file.
         """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsSelf]
     http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch')
 
-    @action(detail=False)
-    def rating(self, request):
-        content = request.GET.get('content', 'image')
-        posts = Post.objects.exclude(**{content: ''})
-        users = User.objects.prefetch_related('posts').filter(posts__in=posts.values('id')).annotate(
-            views_count=Sum('posts__views')).order_by('-views_count')
-        page = self.paginate_queryset(users)
-        if page is not None:
-            serializer = RatingUser(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(users, many=True)
-        return Response(serializer.data)
+    # @action(detail=False)
+    # def rating(self, request):
+    #     content = request.GET.get('content', 'image')
+    #     posts = Post.objects.exclude(**{content: ''})
+    #     users = User.objects.prefetch_related('posts').filter(posts__in=posts.values('id')).annotate(
+    #         views_count=Sum('posts__views')).order_by('-views_count')
+    #     page = self.paginate_queryset(users)
+    #     if page is not None:
+    #         serializer = RatingUser(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
+    #
+    #     serializer = self.get_serializer(users, many=True)
+    #     return Response(serializer.data)
 
     def get_permissions(self):
-        if self.action in ('create', 'list', 'retrieve', 'rating'):
+        if self.action in ('create', 'list', 'retrieve'):
             self.permission_classes = ()
         return super().get_permissions()
 
