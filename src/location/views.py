@@ -3,6 +3,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from location.models import City
 from location.serializers import CitySerializer
+from social.filters import CityFilter
 
 
 class CityViewSet(ModelViewSet):
@@ -16,3 +17,4 @@ class CityViewSet(ModelViewSet):
     permission_classes = (AllowAny,)
     serializer_class = CitySerializer
     queryset = City.objects.all()
+    filter_class = CityFilter

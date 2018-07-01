@@ -2,7 +2,7 @@ from django.db.models import F
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from social.filters import PostFilter
+from social.filters import PostFilter, TeamFilter
 from social.models import Post, Events, Team
 from social.permissions import IsOwnerSelf
 from social.serializers import PostSerializer, BasePostSerializer, EventSerializer, TeamSerializer, BaseEventSerializer, \
@@ -92,3 +92,4 @@ class TeamVieSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     queryset = Team.objects.all()
     serializer_class = BaseTeamSerializer
+    filter_class = TeamFilter
