@@ -125,3 +125,12 @@ class Crown(models.Model):
             '-views')[:3]
         Crown.objects.bulk_create(
             [Crown(post=post[1], type=post[0], post_type='video_file') for post in enumerate(video_posts)])
+
+
+class PostLike(models.Model):
+    post = models.ForeignKey(Post, related_name='post_likes', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='user_likes', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = _('Лайк')
+        verbose_name_plural = _('Лайки')

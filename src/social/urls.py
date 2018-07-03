@@ -12,4 +12,5 @@ router.register(r'teams', views.TeamVieSet, base_name='teams')
 
 urlpatterns = [
     path(r'', include(router.urls)),
+    path(r'like/add/<int:post_pk>', views.LikePostView.as_view(), name='add_like'),
 ]

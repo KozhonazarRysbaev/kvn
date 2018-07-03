@@ -1,13 +1,13 @@
 from django.db.models import F
 from django.db.models.expressions import RawSQL
-from django.http import Http404
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from social.filters import PostFilter, TeamFilter
-from social.models import Post, Events, Team, PostComment
+from social.models import Post, Events, Team, PostComment, PostLike
 from social.permissions import IsOwnerSelf, IsCommentStatus
 from social.serializers import PostSerializer, BasePostSerializer, EventSerializer, BaseEventSerializer, \
     BaseTeamSerializer, RatingPost, PostCommentSerializer
@@ -158,3 +158,29 @@ class PostCommentVieSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user, post_id=self.kwargs['post_pk'])
+
+
+class LikePostView(RetrieveAPIView):
+    """
+    get:
+        Will return a message, send post_pk.
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        like = PostLike.objects.filter(post_id=self.kwargs['post_pk'], user=self.request.user).select_related('user',
+                                                                                                              'post')
+        if like:
+            like.first().delete()
+            success = True
+            message = "Лайк успешно удален!"
+        else:
+            post = get_object_or_404(Post, id=self.kwargs['post_pk'])
+            like = PostLike(post=post, user=self.request.user)
+            like.save()
+            success = True
+            message = "Лайк успешно добавлен"
+        return Response({
+            "success": success,
+            "message": message
+        })

@@ -24,12 +24,27 @@ class UserPostSerializer(serializers.ModelSerializer):
 class BasePostSerializer(serializers.ModelSerializer):
     user = UserPostSerializer(many=False)
     image = HyperlinkedSorlImageField('1024', required=False)
+    like_count = serializers.SerializerMethodField()
+    is_like = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
         fields = (
-            'id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views',
-            'comment_status', 'user')
+            'id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views', 'like_count',
+            'is_like', 'comment_status', 'user')
+
+    def get_like_count(self, obj):
+        return obj.post_likes.all().count()
+
+    def get_is_like(self, obj):
+        request = self.context.get('request')
+        user = request.user
+        if user.is_authenticated:
+            if obj.post_likes.filter(user=user).exists():
+                return True
+            else:
+                return False
+        return False
 
 
 class RatingPost(BasePostSerializer):
