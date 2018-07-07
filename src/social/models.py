@@ -115,8 +115,6 @@ class Crown(models.Model):
         today = date.today()
         get_sunday = (today - timedelta(days=today.weekday())) - timedelta(days=1)
         get_monday = get_sunday - timedelta(days=7)
-        print(get_sunday)
-        print(get_monday)
         image_posts = Post.objects.filter(created_at__range=(get_monday, get_sunday)).exclude(image='').order_by(
             '-views')[:3]
         Crown.objects.bulk_create(
