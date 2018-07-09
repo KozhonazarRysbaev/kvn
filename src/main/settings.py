@@ -199,6 +199,7 @@ FIXTURES_DIR = os.path.join(os.path.dirname(BASE_DIR), 'fixtures')
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_IMPORTS = ("social.tasks", )
 
 try:
     from main.settings_local import *

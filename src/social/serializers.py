@@ -24,10 +24,11 @@ class UserPostSerializer(serializers.ModelSerializer):
 class BasePostSerializer(serializers.ModelSerializer):
     user = UserPostSerializer(many=False)
     image = HyperlinkedSorlImageField('1024', required=False)
+    crown = serializers.IntegerField()
 
     class Meta:
         model = Post
-        fields = ('id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views', 'user')
+        fields = ('id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views', 'user', 'crown')
 
 
 class PostSerializer(serializers.ModelSerializer):

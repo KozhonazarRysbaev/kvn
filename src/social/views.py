@@ -1,4 +1,7 @@
+from datetime import timedelta, date
+
 from django.db.models import F
+from django.db.models.expressions import RawSQL
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -42,6 +45,15 @@ class PostVieSet(viewsets.ModelViewSet):
         else:
             self.permission_classes = [AllowAny]
         return super().get_permissions()
+
+    def get_queryset(self):
+        today = date.today()
+        get_sunday = (today - timedelta(days=today.weekday())) - timedelta(days=1)
+        get_monday = get_sunday - timedelta(days=7)
+        crown_query = """
+            SELECT type FROM social_crown WHERE post_id=social_post.id
+        """
+        return Post.objects.select_related('user').annotate(crown=RawSQL(crown_query, ())).order_by('-created_at')
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
