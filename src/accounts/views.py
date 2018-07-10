@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
 from accounts.serializers import UserSerializer, UserUpdateSerializer, PostUserSerializer, RatingUser, \
-    UserCreateSerializer, ChangePasswordSerializer
+    UserCreateSerializer, ChangePasswordSerializer, UserCrystalSerializer
 from accounts.models import User
 from accounts.permissions import IsSelf
 from social.models import Post
@@ -38,19 +38,15 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
     permission_classes = [IsAuthenticated, IsSelf]
     http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch')
 
-    # @action(detail=False)
-    # def rating(self, request):
-    #     content = request.GET.get('content', 'image')
-    #     posts = Post.objects.exclude(**{content: ''})
-    #     users = User.objects.prefetch_related('posts').filter(posts__in=posts.values('id')).annotate(
-    #         views_count=Sum('posts__views')).order_by('-views_count')
-    #     page = self.paginate_queryset(users)
-    #     if page is not None:
-    #         serializer = RatingUser(page, many=True)
-    #         return self.get_paginated_response(serializer.data)
-    #
-    #     serializer = self.get_serializer(users, many=True)
-    #     return Response(serializer.data)
+    @action(detail=False, permission_classes=[])
+    def rating(self, request):
+        users = User.objects.annotate(crystals=Sum('transactions__amount')).order_by('-crystals')
+        page = self.paginate_queryset(users)
+        if page is not None:
+            serializer = UserCrystalSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(users, many=True)
+        return Response(serializer.data)
 
     def get_permissions(self):
         if self.action in ('create', 'list', 'retrieve'):

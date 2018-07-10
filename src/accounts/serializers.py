@@ -100,3 +100,12 @@ class ChangePasswordSerializer(serializers.Serializer):
         """
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+
+
+class UserCrystalSerializer(serializers.ModelSerializer):
+    crystals = serializers.IntegerField()
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'email', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper', 'crystals')
