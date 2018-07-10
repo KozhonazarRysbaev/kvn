@@ -2,7 +2,7 @@ from rest_framework import serializers
 from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
 
 from accounts.models import User
-from social.models import Post, RequestTeam
+from social.models import Post, RequestTeam, Team
 
 
 class PostUserSerializer(serializers.ModelSerializer):
@@ -10,19 +10,29 @@ class PostUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views')
+        fields = (
+            'id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views',
+            'comment_status')
+
+
+class UserTeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ('id', 'title', 'logo')
 
 
 class UserSerializer(serializers.ModelSerializer):
     avatar = HyperlinkedSorlImageField('1024', required=False)
     wallpaper = HyperlinkedSorlImageField('1024', required=False)
     post_count = serializers.SerializerMethodField()
+    team_owners = UserTeamSerializer(many=True)
+    team_members = UserTeamSerializer(many=True)
 
     class Meta:
         model = User
         fields = (
             'id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper',
-            'post_count')
+            'post_count', 'team_owners', 'team_members')
 
     def to_representation(self, obj):
         ret = super().to_representation(obj)

@@ -4,7 +4,7 @@ from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
 
 from accounts.models import User
 from location.serializers import CitySerializer
-from social.models import Post, Events, Team
+from social.models import Post, Events, Team, PostComment
 
 
 class DateTimeFieldWihTZ(serializers.DateTimeField):
@@ -24,11 +24,27 @@ class UserPostSerializer(serializers.ModelSerializer):
 class BasePostSerializer(serializers.ModelSerializer):
     user = UserPostSerializer(many=False)
     image = HyperlinkedSorlImageField('1024', required=False)
+    like_count = serializers.SerializerMethodField()
+    is_like = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
         fields = (
-            'id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views', 'user')
+            'id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views', 'like_count',
+            'is_like', 'comment_status', 'user')
+
+    def get_like_count(self, obj):
+        return obj.post_likes.all().count()
+
+    def get_is_like(self, obj):
+        request = self.context.get('request')
+        user = request.user
+        if user.is_authenticated:
+            if obj.post_likes.filter(user=user).exists():
+                return True
+            else:
+                return False
+        return False
 
 
 class RatingPost(BasePostSerializer):
@@ -46,7 +62,7 @@ class RatingPost(BasePostSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ('id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height')
+        fields = ('id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'comment_status')
 
 
 class BaseTeamSerializer(serializers.ModelSerializer):
@@ -70,8 +86,6 @@ class BaseEventSerializer(serializers.ModelSerializer):
     created_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
     expired_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
 
-    # status = serializers.SerializerMethodField()
-
     class Meta:
         model = Events
         fields = ('id', 'title', 'created_at', 'expired_at', 'team')
@@ -88,3 +102,15 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Events
         fields = ('id', 'title', 'created_at', 'expired_at', 'team')
+
+
+class PostCommentSerializer(serializers.ModelSerializer):
+    user = UserPostSerializer(many=False, read_only=True)
+    created_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M", read_only=True)
+
+    class Meta:
+        model = PostComment
+        fields = ('id', 'comment', 'created_at', 'user')
+
+    def create(self, validated_data):
+        return PostComment.objects.create(**validated_data)
