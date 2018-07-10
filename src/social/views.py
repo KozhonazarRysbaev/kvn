@@ -1,3 +1,5 @@
+from datetime import timedelta, date
+
 from django.db.models import F
 from django.db.models.expressions import RawSQL
 from rest_framework import viewsets
@@ -52,9 +54,11 @@ class PostVieSet(viewsets.ModelViewSet):
     @action(detail=False)
     def rating(self, request):
         content = request.GET.get('content', 'image')
+        today = date.today()
+        get_sunday = (today - timedelta(days=today.weekday())) - timedelta(days=1)
         crown_query = """
-                    SELECT type FROM social_crown WHERE post_id=social_post.id
-                """
+                    SELECT type FROM social_crown WHERE post_id=social_post.id AND created_at > '{0}'
+                """.format(get_sunday.strftime('%Y-%m-%d %H:%M:%S'))
         post = Post.objects.exclude(**{content: ''}).select_related('user').annotate(
             crown=RawSQL(crown_query, ())).order_by(F('crown').asc(nulls_last=True), F('views').desc(nulls_last=True))
 

@@ -101,13 +101,11 @@ class Crown(models.Model):
         today = date.today()
         get_sunday = (today - timedelta(days=today.weekday())) - timedelta(days=1)
         get_monday = get_sunday - timedelta(days=7)
-        print(get_sunday)
-        print(get_monday)
-        image_posts = Post.objects.filter(created_at__range=(get_monday, get_sunday)).exclude(image='').order_by(
+        image_posts = Post.objects.filter(created_at__range=(get_monday, get_sunday), crowns__isnull=True).exclude(image='').order_by(
             '-views')[:3]
         Crown.objects.bulk_create(
             [Crown(post=post[1], type=post[0], post_type='image') for post in enumerate(image_posts)])
-        video_posts = Post.objects.filter(created_at__range=(get_monday, get_sunday)).exclude(video_file='').order_by(
+        video_posts = Post.objects.filter(created_at__range=(get_monday, get_sunday), crowns__isnull=True).exclude(video_file='').order_by(
             '-views')[:3]
         Crown.objects.bulk_create(
             [Crown(post=post[1], type=post[0], post_type='video_file') for post in enumerate(video_posts)])
