@@ -32,6 +32,9 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
         update:
            Update user, only owner is available
 
+        rating:
+            List of Users with crystals
+
         """
     queryset = User.objects.all()
     serializer_class = UserSerializer
