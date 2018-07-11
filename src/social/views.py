@@ -65,7 +65,7 @@ class PostVieSet(viewsets.ModelViewSet):
             SELECT trans.amount from billing_crystaltransaction as trans inner join django_content_type as content on content.id=trans.content_type_id where trans.object_id=social_post.id and content.model='polls' and created_at > '{0}'
         """.format(get_sunday.strftime('%Y-%m-%d %H:%M:%S'))
         post = Post.objects.exclude(**{content: ''}).select_related('user').annotate(
-            crown=RawSQL(crown_query, ()), crystal=RawSQL(crystal_query, ())).order_by(F('crown').asc(nulls_last=True),
+            crown=RawSQL(crown_query, ()), crystals=RawSQL(crystal_query, ())).order_by(F('crown').asc(nulls_last=True),
                                                                                        F('views').desc(nulls_last=True))
 
         page = self.paginate_queryset(post)
