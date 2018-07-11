@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'django_celery_results',
     'accounts',
     'social',
-    'location'
+    'location',
+    'billing'
 ]
 
 MIDDLEWARE = [
