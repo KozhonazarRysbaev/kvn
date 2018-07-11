@@ -9,6 +9,7 @@ from accounts.views import ChangePasswordView
 router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'users', views.UserViewSet)
 router.register(r'users/(?P<user_pk>[0-9]+)/posts', views.UserPostViewSet, base_name='user_posts')
+router.register(r'profession', views.ProfessionViewSet, 'profession')
 
 urlpatterns = [
     path(r'', include(router.urls)),

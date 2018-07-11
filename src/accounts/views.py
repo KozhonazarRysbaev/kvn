@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
 from accounts.serializers import UserSerializer, UserUpdateSerializer, PostUserSerializer, RatingUser, \
-    UserCreateSerializer, ChangePasswordSerializer, UserCrystalSerializer
-from accounts.models import User
+    UserCreateSerializer, ChangePasswordSerializer, UserCrystalSerializer, ProfessionSerializer
+from accounts.models import User, Profession
 from accounts.permissions import IsSelf
 from social.models import Post
 
@@ -110,3 +110,20 @@ class ChangePasswordView(UpdateAPIView):
             return Response("Success.", status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfessionViewSet(viewsets.ModelViewSet):
+    """
+       retrieve:
+           Not work, return 404 Not Found
+
+       list:
+           Return all professions
+    """
+    http_method_names = ('get', 'head', 'options',)
+    permission_classes = (AllowAny,)
+    serializer_class = ProfessionSerializer
+    queryset = Profession.objects.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        raise Http404

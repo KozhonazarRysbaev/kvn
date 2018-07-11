@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
 
-from accounts.models import User
+from accounts.models import User, Profession
 from social.models import Post, RequestTeam, Team
 
 
@@ -21,6 +21,12 @@ class UserTeamSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'logo')
 
 
+class ProfessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profession
+        fields = ('id', 'name', 'icon')
+
+
 class UserSerializer(serializers.ModelSerializer):
     avatar = HyperlinkedSorlImageField('1024', required=False)
     wallpaper = HyperlinkedSorlImageField('1024', required=False)
@@ -28,12 +34,13 @@ class UserSerializer(serializers.ModelSerializer):
     team_owners = UserTeamSerializer(many=True)
     team_members = UserTeamSerializer(many=True)
     crystals = serializers.IntegerField()
+    profession = ProfessionSerializer()
 
     class Meta:
         model = User
         fields = (
             'id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper',
-            'post_count', 'team_owners', 'team_members', 'crystals')
+            'post_count', 'team_owners', 'team_members', 'profession', 'crystals')
 
     def to_representation(self, obj):
         ret = super().to_representation(obj)
@@ -54,7 +61,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper',
-            'team_id')
+            'team_id', 'profession')
 
     def create(self, validated_data):
         user = User(email=validated_data['email'],
@@ -65,6 +72,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
                     first_name=validated_data.get('first_name', None),
                     last_name=validated_data.get('last_name', None),
                     wallpaper=validated_data.get('wallpaper', None),
+                    profession=validated_data.get('profession', None),
                     )
         user.set_password(validated_data['password'])
         user.save()
@@ -117,4 +125,3 @@ class UserCrystalSerializer(serializers.ModelSerializer):
             return self.context['request'].build_absolute_uri(obj.avatar.url)
         else:
             return None
-
