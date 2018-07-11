@@ -51,12 +51,13 @@ class RatingPost(BasePostSerializer):
     user = UserPostSerializer(many=False)
     image = HyperlinkedSorlImageField('1024', required=False)
     crown = serializers.IntegerField()
+    crystals = serializers.IntegerField()
 
     class Meta:
         model = Post
         fields = (
             'id', 'title', 'description', 'video_file', 'image', 'image_width', 'image_height', 'views', 'user',
-            'crown')
+            'crown', 'crystals')
 
 
 class PostSerializer(serializers.ModelSerializer):
