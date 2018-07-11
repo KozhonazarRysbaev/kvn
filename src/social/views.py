@@ -13,6 +13,7 @@ from social.models import Post, Events, Team, PostComment, PostLike
 from social.permissions import IsOwnerSelf, IsCommentStatus
 from social.serializers import PostSerializer, BasePostSerializer, EventSerializer, BaseEventSerializer, \
     BaseTeamSerializer, RatingPost, PostCommentSerializer
+from billing.models import CrystalTransaction
 
 
 class PostVieSet(viewsets.ModelViewSet):
@@ -62,8 +63,8 @@ class PostVieSet(viewsets.ModelViewSet):
                     SELECT type FROM social_crown WHERE post_id=social_post.id AND created_at > '{0}'
                 """.format(get_sunday.strftime('%Y-%m-%d %H:%M:%S'))
         crystal_query = """
-            SELECT trans.amount from billing_crystaltransaction as trans inner join django_content_type as content on content.id=trans.content_type_id where trans.object_id=social_post.id and content.model='polls'
-        """
+            SELECT trans.amount from billing_crystaltransaction as trans inner join django_content_type as content on content.id=trans.content_type_id where trans.object_id=social_post.id and content.model='post' AND created_at > '{0}'
+        """.format(get_sunday.strftime('%Y-%m-%d %H:%M:%S'))
         post = Post.objects.exclude(**{content: ''}).select_related('user').annotate(
             crown=RawSQL(crown_query, ()), crystals=RawSQL(crystal_query, ())).order_by(F('crown').asc(nulls_last=True),
                                                                                        F('views').desc(nulls_last=True))

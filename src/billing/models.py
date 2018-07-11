@@ -25,7 +25,7 @@ class CrystalTransaction(models.Model):
     created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.user.username
+        return self.user.email
 
     class Meta:
         verbose_name = u'Транзакция кристала'
