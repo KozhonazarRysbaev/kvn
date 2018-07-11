@@ -36,7 +36,7 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
             List of Users with crystals
 
         """
-    queryset = User.objects.all()
+    queryset = User.objects.annotate(crystals=Sum('transactions__amount')).order_by('-crystals')
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsSelf]
     http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch')
