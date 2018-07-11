@@ -105,8 +105,16 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class UserCrystalSerializer(serializers.ModelSerializer):
     crystals = serializers.IntegerField()
+    avatar = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = (
             'id', 'email', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper', 'crystals')
+
+    def get_avatar(self, obj):
+        if obj.avatar:
+            return self.context['request'].build_absolute_uri(obj.avatar.url)
+        else:
+            return None
+

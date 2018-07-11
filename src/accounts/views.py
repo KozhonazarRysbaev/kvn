@@ -46,7 +46,7 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
         users = User.objects.annotate(crystals=Sum('transactions__amount')).order_by('-crystals')
         page = self.paginate_queryset(users)
         if page is not None:
-            serializer = UserCrystalSerializer(page, many=True)
+            serializer = UserCrystalSerializer(page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(users, many=True)
         return Response(serializer.data)
