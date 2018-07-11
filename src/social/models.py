@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from location.models import City
 from main.utils import post_video_path, post_image_path, team_logo_path
+from billing.models import CrystalTransaction
 
 User = get_user_model()
 
@@ -115,14 +116,26 @@ class Crown(models.Model):
         today = date.today()
         get_sunday = (today - timedelta(days=today.weekday())) - timedelta(days=1)
         get_monday = get_sunday - timedelta(days=7)
-        image_posts = Post.objects.filter(created_at__range=(get_monday, get_sunday), crowns__isnull=True).exclude(image='').order_by(
-            '-views')[:3]
+        crown = slice(0, 3)
+        crystal = slice(0, 15)
+        image_query = Post.objects.filter(created_at__range=(get_monday, get_sunday + timedelta(days=1)),
+                                          crowns__isnull=True).exclude(image='').order_by(
+            '-views')
+        video_query = Post.objects.filter(created_at__range=(get_monday, get_sunday + timedelta(days=1)),
+                                          crowns__isnull=True).exclude(video_file='').order_by(
+            '-views')
+        CrystalTransaction.objects.bulk_create(
+            [CrystalTransaction(user=post[1].user, amount=1, content_object=post[1], action='cash_in') for post in
+             enumerate(image_query[crystal])]
+        )
+        CrystalTransaction.objects.bulk_create(
+            [CrystalTransaction(user=post[1].user, amount=1, content_object=post[1], action='cash_in') for post in
+             enumerate(video_query[crystal])]
+        )
         Crown.objects.bulk_create(
-            [Crown(post=post[1], type=post[0], post_type='image') for post in enumerate(image_posts)])
-        video_posts = Post.objects.filter(created_at__range=(get_monday, get_sunday), crowns__isnull=True).exclude(video_file='').order_by(
-            '-views')[:3]
+            [Crown(post=post[1], type=post[0], post_type='image') for post in enumerate(image_query[crown])])
         Crown.objects.bulk_create(
-            [Crown(post=post[1], type=post[0], post_type='video_file') for post in enumerate(video_posts)])
+            [Crown(post=post[1], type=post[0], post_type='video_file') for post in enumerate(video_query[crown])])
 
 
 class PostLike(models.Model):
