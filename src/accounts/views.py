@@ -9,7 +9,8 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
 from accounts.serializers import UserSerializer, UserUpdateSerializer, PostUserSerializer, RatingUser, \
-    UserCreateSerializer, ChangePasswordSerializer, UserCrystalSerializer, ProfessionSerializer
+    UserCreateSerializer, ChangePasswordSerializer, UserCrystalSerializer, ProfessionSerializer, \
+    ProfessionUserSerializer
 from accounts.models import User, Profession
 from accounts.permissions import IsSelf
 from social.models import Post
@@ -115,7 +116,7 @@ class ChangePasswordView(UpdateAPIView):
 class ProfessionViewSet(viewsets.ModelViewSet):
     """
        retrieve:
-           Not work, return 404 Not Found
+           Return instance object profession
 
        list:
            Return all professions
@@ -125,5 +126,20 @@ class ProfessionViewSet(viewsets.ModelViewSet):
     serializer_class = ProfessionSerializer
     queryset = Profession.objects.all()
 
+
+class ProfessionUserViewSet(viewsets.ModelViewSet):
+    """
+    list:
+        Return all user profession
+    retrieve:
+           Not work, return 404 Not Found
+    """
+    serializer_class = ProfessionUserSerializer
+    permission_classes = (AllowAny, )
+    http_method_names = ('get', 'head', 'options')
+
     def retrieve(self, request, *args, **kwargs):
         raise Http404
+
+    def get_queryset(self):
+        return User.objects.filter(profession__id=self.kwargs['profession_pk'])

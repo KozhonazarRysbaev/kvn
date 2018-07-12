@@ -1,4 +1,3 @@
-
 from django.urls import path, include
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 from rest_framework import routers
@@ -10,6 +9,8 @@ router = routers.DefaultRouter(trailing_slash=False)
 router.register(r'users', views.UserViewSet)
 router.register(r'users/(?P<user_pk>[0-9]+)/posts', views.UserPostViewSet, base_name='user_posts')
 router.register(r'profession', views.ProfessionViewSet, 'profession')
+router.register(r'profession/(?P<profession_pk>[0-9]+)/users', views.ProfessionUserViewSet,
+                base_name='profession_users')
 
 urlpatterns = [
     path(r'', include(router.urls)),

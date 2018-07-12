@@ -52,6 +52,22 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.posts.all().count()
 
 
+class ProfessionUserSerializer(serializers.ModelSerializer):
+    avatar = HyperlinkedSorlImageField('1024', required=False)
+    wallpaper = HyperlinkedSorlImageField('1024', required=False)
+    post_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'email', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper',
+            'post_count')
+
+    @staticmethod
+    def get_post_count(obj):
+        return obj.posts.all().count()
+
+
 class UserCreateSerializer(serializers.ModelSerializer):
     avatar = HyperlinkedSorlImageField('1024', required=False)
     wallpaper = HyperlinkedSorlImageField('1024', required=False)
