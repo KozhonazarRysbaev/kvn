@@ -53,7 +53,7 @@ class PostVieSet(viewsets.ModelViewSet):
         crown_query = """
             SELECT type FROM social_crown WHERE post_id=social_post.id
         """
-        return Post.objects.select_related('user').annotate(crown=RawSQL(crown_query, ())).order_by('-created_at', 'crown')
+        return Post.objects.select_related('user').annotate(crown=RawSQL(crown_query, ())).order_by('crown', '-created_at')
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
