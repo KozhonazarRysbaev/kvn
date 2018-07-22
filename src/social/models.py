@@ -145,3 +145,23 @@ class PostLike(models.Model):
     class Meta:
         verbose_name = _('Лайк')
         verbose_name_plural = _('Лайки')
+
+
+class RequestDonationsManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
+
+class RequestDonations(models.Model):
+    team = models.ForeignKey(Team, related_name='team_request_donations', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Создан'))
+    expired_at = models.DateTimeField(verbose_name=_('Дата и время истечение'))
+    description = models.TextField(verbose_name=_('Описание'))
+    is_active = models.BooleanField(default=True, verbose_name=_('Активен'))
+
+    all_objects = models.Manager()
+    objects = RequestDonationsManager()
+
+    class Meta:
+        verbose_name = _('Запрос на пожертвования')
+        verbose_name_plural = _('Запросы на пожертвования')

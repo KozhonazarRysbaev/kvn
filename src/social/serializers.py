@@ -4,7 +4,7 @@ from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
 
 from accounts.models import User
 from location.serializers import CitySerializer
-from social.models import Post, Events, Team, PostComment
+from social.models import Post, Events, Team, PostComment, RequestDonations
 
 
 class DateTimeFieldWihTZ(serializers.DateTimeField):
@@ -115,3 +115,27 @@ class PostCommentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return PostComment.objects.create(**validated_data)
+
+
+class TeamRequestDonationsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ('id', 'title', 'logo')
+
+
+class BaseRequestDonationsSerializer(serializers.ModelSerializer):
+    team = TeamRequestDonationsSerializer(many=False)
+    created_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
+    expired_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
+
+    class Meta:
+        model = RequestDonations
+        fields = ('id', 'created_at', 'expired_at', 'description', 'team')
+
+
+class RequestDonationsSerializer(serializers.ModelSerializer):
+    expired_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
+
+    class Meta:
+        model = RequestDonations
+        fields = ('id', 'expired_at', 'description')

@@ -9,10 +9,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from social.filters import PostFilter, TeamFilter
-from social.models import Post, Events, Team, PostComment, PostLike
-from social.permissions import IsOwnerSelf, IsCommentStatus
+from social.models import Post, Events, Team, PostComment, PostLike, RequestDonations
+from social.permissions import IsOwnerSelf, IsCommentStatus, IsOwnerTeam
 from social.serializers import PostSerializer, BasePostSerializer, EventSerializer, BaseEventSerializer, \
-    BaseTeamSerializer, RatingPost, PostCommentSerializer
+    BaseTeamSerializer, RatingPost, PostCommentSerializer, RequestDonationsSerializer, BaseRequestDonationsSerializer
 from billing.models import CrystalTransaction
 
 
@@ -67,7 +67,8 @@ class PostVieSet(viewsets.ModelViewSet):
         """.format(get_sunday.strftime('%Y-%m-%d %H:%M:%S'))
         post = Post.objects.exclude(**{content: ''}).select_related('user').annotate(
             crown=RawSQL(crown_query, ()), crystals=RawSQL(crystal_query, ())).order_by(F('crown').asc(nulls_last=True),
-                                                                                       F('views').desc(nulls_last=True))
+                                                                                        F('views').desc(
+                                                                                            nulls_last=True))
 
         page = self.paginate_queryset(post)
         if page is not None:
@@ -193,3 +194,34 @@ class LikePostView(RetrieveAPIView):
             "success": success,
             "message": message
         })
+
+
+class RequestDonationsVieSet(viewsets.ModelViewSet):
+    """
+    retrieve:
+        Return a request donations instance.
+
+    list:
+        Return all request donations
+
+    create:
+        Creates a new request donations, only for authorized users, Only the captain can apply.
+    """
+    serializer_class = BaseRequestDonationsSerializer
+    queryset = RequestDonations.objects.all().order_by('-created_at')
+    http_method_names = ('get', 'head', 'options', 'post')
+
+    def get_permissions(self):
+        if self.action == 'create':
+            self.permission_classes = [IsAuthenticated, IsOwnerTeam]
+        else:
+            self.permission_classes = [AllowAny]
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            self.serializer_class = RequestDonationsSerializer
+        return super().get_serializer_class()
+
+    def perform_create(self, serializer):
+        serializer.save(team=self.request.user.team_owners.first())
