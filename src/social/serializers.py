@@ -79,7 +79,7 @@ class BaseTeamSerializer(serializers.ModelSerializer):
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ('id', 'title')
+        fields = ('id', 'title', 'logo')
 
 
 class BaseEventSerializer(serializers.ModelSerializer):
