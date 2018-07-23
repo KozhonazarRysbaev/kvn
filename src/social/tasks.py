@@ -1,11 +1,11 @@
-from datetime import timedelta
+from datetime import timedelta, date, datetime
 
 import celery
 import logging
 
 from celery.schedules import crontab
 
-from social.models import Crown
+from social.models import Crown, RequestDonations
 
 logger = logging.getLogger(__name__)
 
@@ -17,3 +17,11 @@ def create_result_last_week():
     except Exception as e:
         logger.error(str(e))
         raise create_result_last_week.retry(e)
+
+
+@celery.task.periodic_task(run_every=timedelta(hours=1))
+def check_expired_request_donate():
+    try:
+        RequestDonations.objects.filter(expired_at__lte=datetime.now()).update(is_active=False)
+    except Exception as e:
+        raise logger.error(str(e))
