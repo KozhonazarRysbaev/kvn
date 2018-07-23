@@ -38,7 +38,7 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
             List of Users with crystals
 
         donation:
-            Donation for user
+            Donation for user post parameter amount
 
         """
     queryset = User.objects.annotate(crystals=Sum('transactions__amount')).order_by('-crystals')
