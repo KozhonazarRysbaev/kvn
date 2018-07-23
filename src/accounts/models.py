@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import BaseUserManager, AbstractUser, \
     PermissionsMixin
+from django.db.models import Sum, F, Case, When, Value
 
 from main.utils import avatar_image_path, wallpaper_image_path, profession_icon_path
 
@@ -58,6 +59,11 @@ class User(AbstractUser):
         if self.avatar:
             return "{}{}".format(settings.MEDIA_URL, self.avatar)
         return '/media/avatars/494743aa-12f1-4ad6-a6c8-ae70bdd103d2.jpg'
+
+    def get_balance(self):
+        return int(self.transactions.aggregate(
+            result=Sum(Case(When(action='cash_in', then=F('amount')), default=Value(0))) - Sum(
+                Case(When(action='cash_out', then=F('amount')), default=Value(0)))).get('result') or 0)
 
 
 class Profession(models.Model):

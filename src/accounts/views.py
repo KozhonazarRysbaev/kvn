@@ -1,6 +1,6 @@
 from django.http import Http404
 from django.db.models import Sum, Q
-from django.db.models import OuterRef, Subquery
+from django.db import transaction
 from rest_framework import viewsets, status
 from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -14,6 +14,7 @@ from accounts.serializers import UserSerializer, UserUpdateSerializer, PostUserS
 from accounts.models import User, Profession
 from accounts.permissions import IsSelf
 from social.models import Post
+from billing.models import CrystalTransaction
 
 
 class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
@@ -36,6 +37,9 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
         rating:
             List of Users with crystals
 
+        donation:
+            Donation for user
+
         """
     queryset = User.objects.annotate(crystals=Sum('transactions__amount')).order_by('-crystals')
     serializer_class = UserSerializer
@@ -51,6 +55,23 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(users, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, permission_classes=[IsAuthenticated], methods=['post'])
+    def donation(self, request, pk):
+        amount = request.POST.get('amount')
+        if not amount:
+            return Response({'success': False, 'message': 'amount required field'})
+        user_balanse = request.user.get_balance()
+        to_user = self.get_object()
+        if user_balanse and user_balanse >= int(amount):
+            with transaction.atomic():
+                CrystalTransaction.objects.create(user=request.user, amount=amount, content_object=to_user,
+                                                  action='cash_out')
+                CrystalTransaction.objects.create(user=to_user, amount=amount, content_object=request.user,
+                                                  action='cash_in')
+        else:
+            return Response({'success': False, 'message': 'Не достаточно кристалов'}, status=403)
+        return Response({'success': True, 'message': 'Вы успешно перевели койны'})
 
     def get_permissions(self):
         if self.action in ('create', 'list', 'retrieve'):
@@ -135,7 +156,7 @@ class ProfessionUserViewSet(viewsets.ModelViewSet):
            Not work, return 404 Not Found
     """
     serializer_class = ProfessionUserSerializer
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
     http_method_names = ('get', 'head', 'options')
 
     def retrieve(self, request, *args, **kwargs):
