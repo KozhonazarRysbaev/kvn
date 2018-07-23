@@ -120,7 +120,7 @@ class PostCommentSerializer(serializers.ModelSerializer):
 class TeamRequestDonationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ('id', 'title', 'logo')
+        fields = ('id', 'title', 'logo', 'owner')
 
 
 class BaseRequestDonationsSerializer(serializers.ModelSerializer):
