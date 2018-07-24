@@ -61,7 +61,7 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
     @action(detail=True, permission_classes=[IsAuthenticated], methods=['post'])
     def donation(self, request, pk):
         if request.content_type == 'application/json':
-            amount = json.loads(request.body).get('amount')
+            amount = json.loads(request.body.decode('utf-8')).get('amount')
         else:
             amount = request.POST.get('amount')
         if not amount:
