@@ -1,3 +1,5 @@
+import json
+
 from django.http import Http404
 from django.db.models import Sum, Q
 from django.db import transaction
@@ -58,7 +60,10 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
 
     @action(detail=True, permission_classes=[IsAuthenticated], methods=['post'])
     def donation(self, request, pk):
-        amount = request.POST.get('amount')
+        if request.content_type == 'application/json':
+            amount = json.loads(request.body).get('amount')
+        else:
+            amount = request.POST.get('amount')
         if not amount:
             return Response({'success': False, 'message': 'amount required field'})
         user_balanse = request.user.get_balance()
