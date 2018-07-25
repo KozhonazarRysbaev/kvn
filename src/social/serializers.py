@@ -126,8 +126,8 @@ class BaseEventSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     team = TeamSerializer(many=True)
-    created_at = DateTimeFieldWihTZ(format="%H:%M")
-    expired_at = DateTimeFieldWihTZ(format="%H:%M")
+    created_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
+    expired_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
     is_voted = serializers.SerializerMethodField()
     is_voting_finish = serializers.SerializerMethodField()
 
