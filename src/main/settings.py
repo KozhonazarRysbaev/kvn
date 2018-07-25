@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'accounts',
     'social',
     'location',
-    'billing'
+    'billing',
+    'chats'
 ]
 
 MIDDLEWARE = [
@@ -166,6 +167,7 @@ LOGGING = {
         },
     }
 }
+
 
 FILE_UPLOAD_PERMISSIONS = 0o644
 # Internationalization
