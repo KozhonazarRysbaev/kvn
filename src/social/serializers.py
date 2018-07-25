@@ -1,10 +1,14 @@
+from datetime import datetime
+
+from django.db import IntegrityError
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
 
 from accounts.models import User
 from location.serializers import CitySerializer
-from social.models import Post, Events, Team, PostComment, RequestDonations
+from social.models import Post, Events, Team, PostComment, RequestDonations, Voting
 
 
 class DateTimeFieldWihTZ(serializers.DateTimeField):
@@ -77,32 +81,80 @@ class BaseTeamSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
+    voting_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Team
-        fields = ('id', 'title', 'logo')
+        fields = ('id', 'title', 'logo', 'voting_count')
+
+    def get_voting_count(self, obj):
+        return obj.team_voting.all().count()
 
 
 class BaseEventSerializer(serializers.ModelSerializer):
     team = TeamSerializer(many=True)
     created_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
     expired_at = DateTimeFieldWihTZ(format="%d.%m.%Y %H:%M")
+    is_voted = serializers.SerializerMethodField()
+    is_voting_finish = serializers.SerializerMethodField()
 
     class Meta:
         model = Events
-        fields = ('id', 'title', 'created_at', 'expired_at', 'team')
+        fields = ('id', 'title', 'created_at', 'expired_at', 'is_voted', 'is_voting_finish', 'team')
 
-    def get_status(self, obj):
-        return 'true'
+    def get_is_voted(self, obj):
+        request = self.context.get('request')
+        user = request.user
+        if user.is_authenticated:
+            try:
+                user = Voting.objects.get(events__id=obj.id, user=user)
+                if user:
+                    return True
+            except Voting.DoesNotExist:
+                return False
+        else:
+            return False
+
+    def get_is_voting_finish(self, obj):
+        try:
+            event = Events.objects.get(pk=obj.id, created_at__gt=datetime.now())
+            if event:
+                return False
+        except Events.DoesNotExist:
+            return True
 
 
 class EventSerializer(serializers.ModelSerializer):
     team = TeamSerializer(many=True)
     created_at = DateTimeFieldWihTZ(format="%H:%M")
     expired_at = DateTimeFieldWihTZ(format="%H:%M")
+    is_voted = serializers.SerializerMethodField()
+    is_voting_finish = serializers.SerializerMethodField()
 
     class Meta:
         model = Events
-        fields = ('id', 'title', 'created_at', 'expired_at', 'team')
+        fields = ('id', 'title', 'created_at', 'expired_at', 'is_voted', 'is_voting_finish', 'team')
+
+    def get_is_voted(self, obj):
+        request = self.context.get('request')
+        user = request.user
+        if user.is_authenticated:
+            try:
+                user = Voting.objects.get(events__id=obj.id, user=user)
+                if user:
+                    return True
+            except Voting.DoesNotExist:
+                return False
+        else:
+            return False
+
+    def get_is_voting_finish(self, obj):
+        try:
+            event = Events.objects.get(pk=obj.id, created_at__gt=datetime.now())
+            if event:
+                return False
+        except Events.DoesNotExist:
+            return True
 
 
 class PostCommentSerializer(serializers.ModelSerializer):
@@ -139,3 +191,15 @@ class RequestDonationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestDonations
         fields = ('id', 'expired_at', 'description')
+
+
+class VotingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Voting
+        fields = ('id', 'team')
+
+    def create(self, validated_data):
+        try:
+            return Voting.objects.create(**validated_data)
+        except IntegrityError:
+            raise ValidationError('Error! You have already voted')

@@ -165,3 +165,14 @@ class RequestDonations(models.Model):
     class Meta:
         verbose_name = _('Запрос на пожертвования')
         verbose_name_plural = _('Запросы на пожертвования')
+
+
+class Voting(models.Model):
+    events = models.ForeignKey(Events, related_name='event_voting', on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, related_name='team_voting', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='user_voting', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = _('Голос')
+        verbose_name_plural = _('Голоса')
+        unique_together = ("events", "team", "user")

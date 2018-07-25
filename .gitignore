@@ -9,3 +9,5 @@ settings_local.py
 src/static
 src/media
 .env
+_mac/
+*.xml

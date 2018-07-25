@@ -9,10 +9,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from social.filters import PostFilter, TeamFilter
-from social.models import Post, Events, Team, PostComment, PostLike, RequestDonations
-from social.permissions import IsOwnerSelf, IsCommentStatus, IsOwnerTeam
+from social.models import Post, Events, Team, PostComment, PostLike, RequestDonations, Voting
+from social.permissions import IsOwnerSelf, IsCommentStatus, IsOwnerTeam, IsVoted, IsVotedUser
 from social.serializers import PostSerializer, BasePostSerializer, EventSerializer, BaseEventSerializer, \
-    BaseTeamSerializer, RatingPost, PostCommentSerializer, RequestDonationsSerializer, BaseRequestDonationsSerializer
+    BaseTeamSerializer, RatingPost, PostCommentSerializer, RequestDonationsSerializer, BaseRequestDonationsSerializer, \
+    VotingSerializer
 from billing.models import CrystalTransaction
 
 
@@ -225,3 +226,15 @@ class RequestDonationsVieSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(team=self.request.user.team_owners.first())
+
+
+class VotingVieSet(viewsets.ModelViewSet):
+    serializer_class = VotingSerializer
+    permission_classes = [IsAuthenticated, IsVoted, IsVotedUser]
+    http_method_names = ('get', 'head', 'options', 'post')
+
+    def get_queryset(self):
+        return Voting.objects.filter(events__pk=self.kwargs['event_pk'])
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user, events_id=self.kwargs['event_pk'])
