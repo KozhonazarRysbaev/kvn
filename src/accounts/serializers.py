@@ -33,7 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
     post_count = serializers.SerializerMethodField()
     team_owners = UserTeamSerializer(many=True)
     team_members = UserTeamSerializer(many=True)
-    crystals = serializers.IntegerField()
+    crystals = serializers.SerializerMethodField()
     profession = ProfessionSerializer()
 
     class Meta:
@@ -41,6 +41,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper',
             'post_count', 'team_owners', 'team_members', 'profession', 'crystals')
+
+    def get_crystals(self, obj):
+        return obj.get_balance()
 
     def to_representation(self, obj):
         ret = super().to_representation(obj)

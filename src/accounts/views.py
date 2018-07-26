@@ -43,7 +43,7 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
             Donation for user post parameter amount
 
         """
-    queryset = User.objects.annotate(crystals=Sum('transactions__amount')).order_by('-crystals')
+    queryset = User.objects.order_by('-crystals')
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsSelf]
     http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch')
