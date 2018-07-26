@@ -1,8 +1,10 @@
+from datetime import timedelta, date
+
 from rest_framework import serializers
 from sorl_thumbnail_serializer.fields import HyperlinkedSorlImageField
 
 from accounts.models import User, Profession
-from social.models import Post, RequestTeam, Team
+from social.models import Post, RequestTeam, Team, Crown
 
 
 class PostUserSerializer(serializers.ModelSerializer):
@@ -33,14 +35,35 @@ class UserSerializer(serializers.ModelSerializer):
     post_count = serializers.SerializerMethodField()
     team_owners = UserTeamSerializer(many=True)
     team_members = UserTeamSerializer(many=True)
-    crystals = serializers.IntegerField()
+    crystals = serializers.SerializerMethodField()
     profession = ProfessionSerializer()
+    pix = serializers.SerializerMethodField()
+    gag = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = (
             'id', 'email', 'password', 'phone', 'sex', 'avatar', 'date_birth', 'first_name', 'last_name', 'wallpaper',
-            'post_count', 'team_owners', 'team_members', 'profession', 'crystals')
+            'post_count', 'team_owners', 'team_members', 'profession', 'crystals', 'pix', 'gag')
+
+    def get_pix(self, obj):
+        today = date.today()
+        get_sunday = (today - timedelta(days=today.weekday())) - timedelta(days=1)
+        crowns = Crown.objects.filter(post__user=obj, created_at__gte=get_sunday, post_type='image').order_by('type')
+        if crowns:
+            return crowns[0].type
+        return None
+
+    def get_gag(self, obj):
+        today = date.today()
+        get_sunday = (today - timedelta(days=today.weekday())) - timedelta(days=1)
+        crowns = Crown.objects.filter(post__user=obj, created_at__gte=get_sunday, post_type='image').order_by('type')
+        if crowns:
+            return crowns[0].type
+        return None
+
+    def get_crystals(self, obj):
+        return obj.get_balance()
 
     def to_representation(self, obj):
         ret = super().to_representation(obj)
