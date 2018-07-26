@@ -10,6 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
+from accounts.filters import UserFilter
 from accounts.serializers import UserSerializer, UserUpdateSerializer, PostUserSerializer, RatingUser, \
     UserCreateSerializer, ChangePasswordSerializer, UserCrystalSerializer, ProfessionSerializer, \
     ProfessionUserSerializer
@@ -46,6 +47,7 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
     queryset = User.objects.annotate(crystals=Sum('transactions__amount')).order_by('-crystals')
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsSelf]
+    filter_class = UserFilter
     http_method_names = ('get', 'head', 'options', 'post', 'put', 'patch')
 
     @action(detail=False, permission_classes=[])
@@ -89,9 +91,6 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
         elif self.action == 'create':
             self.serializer_class = UserCreateSerializer
         return super().get_serializer_class()
-
-    def list(self, request, *args, **kwargs):
-        raise Http404
 
 
 class UserPostViewSet(viewsets.ModelViewSet):
