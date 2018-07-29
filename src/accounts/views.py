@@ -44,7 +44,7 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
             Donation for user post parameter amount
 
         """
-    queryset = User.objects.order_by('-crystals')
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsSelf]
     filter_class = UserFilter
