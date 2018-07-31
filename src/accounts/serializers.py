@@ -20,7 +20,7 @@ class PostUserSerializer(serializers.ModelSerializer):
 class UserTeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ('id', 'title', 'logo')
+        fields = ('id', 'title', 'logo', 'room')
 
 
 class ProfessionSerializer(serializers.ModelSerializer):
