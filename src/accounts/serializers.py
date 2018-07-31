@@ -151,7 +151,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class UserCrystalSerializer(serializers.ModelSerializer):
-    crystals = serializers.IntegerField()
+    crystals = serializers.SerializerMethodField()
     avatar = serializers.SerializerMethodField()
 
     class Meta:
@@ -164,3 +164,6 @@ class UserCrystalSerializer(serializers.ModelSerializer):
             return self.context['request'].build_absolute_uri(obj.avatar.url)
         else:
             return None
+
+    def get_crystals(self, obj):
+        return obj.get_balance()
