@@ -52,7 +52,7 @@ class UserViewSet(viewsets.ModelViewSet, PageNumberPagination):
 
     @action(detail=False, permission_classes=[])
     def rating(self, request):
-        users = User.objects.annotate(crystals=Sum('transactions__amount')).order_by('-crystals')
+        users = User.objects.annotate().order_by('-crystals')
         page = self.paginate_queryset(users)
         if page is not None:
             serializer = UserCrystalSerializer(page, many=True, context={'request': request})
