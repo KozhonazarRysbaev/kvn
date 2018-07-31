@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from location.models import City
 from main.utils import post_video_path, post_image_path, team_logo_path
 from billing.models import CrystalTransaction
+from chats.models import Room
 
 User = get_user_model()
 
@@ -63,6 +64,7 @@ class Team(models.Model):
     owner = models.ForeignKey(User, related_name='team_owners', on_delete=models.CASCADE)
     members = models.ManyToManyField(User, related_name='team_members')
     logo = models.ImageField(upload_to=team_logo_path, verbose_name=_('Лого'))
+    room = models.ForeignKey(Room, null=True, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _('Команда')
